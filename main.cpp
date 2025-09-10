@@ -7,16 +7,16 @@
 int main(int argc, char* argv[]) {
 
     Maze maze;
-    std::ifstream inputFile(argv[1]);
+    std::ifstream inputFile("/Users/parker/Desktop/maze-solver/maze.txt"); //argv[1]
     maze.inputMazeFile(inputFile);
     inputFile.close();
 
-    std::tuple<int, int> startCell = {3, 0}; // {3, 0}
-    std::tuple<int, int> targetCell = {11, 14}; // {11, 14}
+    maze.printMaze();
 
-    while (!maze.isEmpty()) {
 
-    }
+//    while (!maze.isEmpty()) {
+//
+//    }
 
     return 0;
 }

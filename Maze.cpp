@@ -35,3 +35,30 @@ void Maze::printMaze() {
 bool Maze::isEmpty() {
     return path.empty();
 }
+
+void Maze::findEntryExit() {
+    for (int i = 0; i < grid.size(); ++i) {
+        if (grid[i][0] == 0) {
+            startCell = {i, 0};
+        }
+
+        if (grid[i][grid[0].size() - 1] == 0) {
+            targetCell = {i, grid[0].size() - 1};
+        }
+    }
+}
+
+void Maze::searchForPath() {
+    findEntryExit();
+    path.push(startCell);
+
+//    while (!path.empty()) {
+//        if () // top cell has no unexplored adjacent cells
+//    }
+
+}
+
+bool Maze::isValid() {
+
+    return true; // just for warnings
+}
