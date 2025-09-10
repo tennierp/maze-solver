@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     inputFile.close();
 
     maze.searchForPath();
-    maze.printStack();
+    maze.printMaze();
 
     return 0;
 }

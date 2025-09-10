@@ -20,15 +20,34 @@ void Maze::inputMazeFile(std::ifstream &inputFile) {
 }
 
 void Maze::printMaze() {
-    for (const auto &i : grid) {
-        for (const auto &j : i) {
-            if (j == 0) {
-                std::cout << "\033[31m0 \033[0m";
+    if (grid.empty()) return;
+
+    const int rows = static_cast<int>(grid.size());
+    const int cols = static_cast<int>(grid[0].size());
+
+    std::vector<std::vector<bool>> onPath(rows, std::vector<bool>(cols, false));
+
+    // Unwind the stack copy to mark path cells
+    while (!path.empty()) {
+        auto [r, c] = path.top();
+        path.pop();
+        if (r >= 0 && r < rows && c >= 0 && c < cols) {
+            onPath[r][c] = true;
+        }
+    }
+
+    // Print: path '*' first, then walls(1) then open cells(0)
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            if (onPath[r][c]) {
+                std::cout << "\033[32m*\033[0m ";
+            } else if (grid[r][c] == 1) {
+                std::cout << "\033[34m1\033[0m ";
             } else {
-                std::cout << "\033[34m1 \033[0m";
+                std::cout << "\033[31m \033[0m ";
             }
         }
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 }
 

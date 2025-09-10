@@ -19,6 +19,6 @@ private:
     std::vector<std::tuple<int, int>> visited;
     std::stack<std::tuple<int, int>> path;
 
-    std::tuple<int, int> startCell = {-1, -1};
-    std::tuple<int, int> targetCell = {-1, -1};
+    std::tuple<int, int> startCell;  // = {-1, -1}
+    std::tuple<int, int> targetCell; // = {-1, -1};
 };
