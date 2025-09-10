@@ -1,6 +1,8 @@
 #include "Maze.h"
 #include <iostream>
 #include <fstream>
+#include <tuple>
+#include <vector>
 
 void Maze::inputMazeFile(std::ifstream &inputFile) {
     if (!inputFile.is_open()) {

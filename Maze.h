@@ -1,5 +1,8 @@
 #pragma once
 #include <iostream>
+#include <stack>
+#include <tuple>
+#include <vector>
 
 class Maze {
 public:
