@@ -32,8 +32,12 @@ void Maze::printMaze() {
     }
 }
 
-bool Maze::isEmpty() {
-    return path.empty();
+void Maze::printStack() {
+    while (!path.empty()) {
+        std::tuple<int, int> coord = path.top();
+        std::cout << get<0>(coord) << ", " << get<1>(coord) << std::endl;
+        path.pop();
+    }
 }
 
 void Maze::findEntryExit() {
@@ -48,17 +52,66 @@ void Maze::findEntryExit() {
     }
 }
 
+bool Maze::isVisited(std::tuple<int, int> cell) {
+    for (auto &i : visited) {
+        if (cell == i) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Maze::inBounds(std::tuple<int, int> cell) {
+    // row, col
+    if ((get<0>(cell) >= 0 && get<0>(cell) < grid.size()) && (get<1>(cell) >= 0 && get<1>(cell) < grid[0].size())) {
+        return true;
+    }
+
+    return false;
+}
+
+std::tuple<int, int> Maze::nextNeighbor() {
+    const std::tuple<int, int> current = path.top();
+
+    // Fixed order: Down, right, up, left
+    const std::tuple<int,int> adjacentCells[4] = {
+            { std::get<0>(current) + 1, std::get<1>(current) }, // Down
+            { std::get<0>(current),     std::get<1>(current) + 1 }, // Right
+            { std::get<0>(current) - 1, std::get<1>(current) }, // Up
+            { std::get<0>(current),     std::get<1>(current) - 1 }  // Left
+    };
+
+    for (const auto &cell : adjacentCells) {
+        if (inBounds(cell) && !isVisited(cell) && grid[get<0>(cell)][get<1>(cell)] == 0) {
+                return cell;
+        }
+    }
+
+    return std::tuple<int, int>{-1, -1};
+}
+
 void Maze::searchForPath() {
     findEntryExit();
     path.push(startCell);
+    visited.push_back(startCell);
 
-//    while (!path.empty()) {
-//        if () // top cell has no unexplored adjacent cells
-//    }
+    while (!path.empty()) {
+        std::tuple<int, int> neighbor = nextNeighbor();
+        if (neighbor == std::make_tuple(-1, -1)) {
+            path.pop();
+        } else {
+            path.push(neighbor);
+            visited.push_back(neighbor);
 
-}
+            if (path.top() == targetCell) {
+                std::cout << "Path Found!" << std::endl;
+                break;
+            }
+        }
+    }
 
-bool Maze::isValid() {
-
-    return true; // just for warnings
+    if (path.empty()) {
+        std::cout << "No path exists." << std::endl;
+    }
 }

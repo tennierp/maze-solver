@@ -3,11 +3,14 @@
 
 class Maze {
 public:
-    void inputMazeFile(std::ifstream &inputFile);
     void printMaze();
-    bool isEmpty();
+    void printStack();
+
+    void inputMazeFile(std::ifstream &inputFile);
     void searchForPath();
-    static bool isValid();
+    bool isVisited(std::tuple<int, int> cell);
+    bool inBounds(std::tuple<int, int> cell);
+    std::tuple<int, int> nextNeighbor();
 
 private:
     void findEntryExit();
@@ -16,6 +19,6 @@ private:
     std::vector<std::tuple<int, int>> visited;
     std::stack<std::tuple<int, int>> path;
 
-    std::tuple<int, int> startCell;
-    std::tuple<int, int> targetCell;
+    std::tuple<int, int> startCell = {-1, -1};
+    std::tuple<int, int> targetCell = {-1, -1};
 };
