@@ -3,6 +3,7 @@
 #include <fstream>
 #include <tuple>
 #include <vector>
+#include <set>
 
 void Maze::inputMazeFile(std::ifstream &inputFile) {
     if (!inputFile.is_open()) {
@@ -24,52 +25,67 @@ void Maze::inputMazeFile(std::ifstream &inputFile) {
 void Maze::printMaze() {
     if (grid.empty()) return;
 
-    const int rows = static_cast<int>(grid.size());
-    const int cols = static_cast<int>(grid[0].size());
-
-    std::vector<std::vector<bool>> onPath(rows, std::vector<bool>(cols, false));
-
-    // Unwind the stack copy to mark path cells
-    while (!path.empty()) {
-        auto [r, c] = path.top();
-        path.pop();
-        if (r >= 0 && r < rows && c >= 0 && c < cols) {
-            onPath[r][c] = true;
-        }
+    std::set<std::tuple<int,int>> pathCells;
+    auto tmp = path;
+    while (!tmp.empty()) {
+        pathCells.insert(tmp.top());
+        tmp.pop();
     }
 
-    // Print: path '*' first, then walls(1) then open cells(0)
-    for (int r = 0; r < rows; ++r) {
-        for (int c = 0; c < cols; ++c) {
-            if (onPath[r][c]) {
-                std::cout << "\033[32m*\033[0m ";
+    for (int r = 0; r < grid.size(); ++r) {
+        for (int c = 0; c < grid[0].size(); ++c) {
+            std::tuple<int,int> cell{r,c};
+            if (pathCells.count(cell)) {
+                std::cout << "\033[31m* \033[0m"; // path in green
             } else if (grid[r][c] == 1) {
-                std::cout << "\033[34m1\033[0m ";
+                std::cout << "\033[34m1 \033[0m"; // walls in blue
             } else {
-                std::cout << "\033[31m \033[0m ";
+                std::cout << "  "; // open space
             }
         }
         std::cout << '\n';
     }
 }
 
-void Maze::printStack() {
-    while (!path.empty()) {
-        std::tuple<int, int> coord = path.top();
-        std::cout << get<0>(coord) << ", " << get<1>(coord) << std::endl;
-        path.pop();
-    }
-}
+/*
+    top: row 0, search through cols for 0
+    bottom: row maze.size() - 1, search through cols for 0
+    left: search through row, col 0
+    right: search through row, col is row.size() - 1
+ */
 
 void Maze::findEntryExit() {
-    for (int i = 0; i < grid.size(); ++i) {
-        if (grid[i][0] == 0) {
-            startCell = {i, 0};
+    std::vector<std::tuple<int, int>> openings;
+
+    for (int i = 0; i < grid[0].size(); ++i) {
+
+        // top side
+        if (grid[0][i] == 0) {
+            openings.push_back({0, i});
         }
 
-        if (grid[i][grid[0].size() - 1] == 0) {
-            targetCell = {i, grid[0].size() - 1};
+        // bottom side
+        if (grid[grid.size() - 1][i] == 0) {
+            openings.push_back({grid.size() - 1, i});
         }
+    }
+
+    for (int i = 0; i < grid.size(); ++i) {
+
+        // right side
+        if (grid[i][grid[0].size() - 1] == 0) {
+            openings.push_back({i, grid[0].size() - 1});
+        }
+
+        // left side
+        if (grid[i][0] == 0) {
+            openings.push_back({i, 0});
+        }
+    }
+
+    if (openings.size() == 2) {
+        startCell = openings[0];
+        targetCell = openings[1];
     }
 }
 
@@ -84,7 +100,7 @@ bool Maze::isVisited(std::tuple<int, int> cell) {
 }
 
 bool Maze::inBounds(std::tuple<int, int> cell) {
-    // row, col
+    // get<0> row, get<1> col
     if ((get<0>(cell) >= 0 && get<0>(cell) < grid.size()) && (get<1>(cell) >= 0 && get<1>(cell) < grid[0].size())) {
         return true;
     }
@@ -97,9 +113,9 @@ std::tuple<int, int> Maze::nextNeighbor() {
 
     // Fixed order: Down, right, up, left
     const std::tuple<int,int> adjacentCells[4] = {
-            { std::get<0>(current) + 1, std::get<1>(current) }, // Down
+            { std::get<0>(current) + 1, std::get<1>(current) },     // Down
             { std::get<0>(current),     std::get<1>(current) + 1 }, // Right
-            { std::get<0>(current) - 1, std::get<1>(current) }, // Up
+            { std::get<0>(current) - 1, std::get<1>(current) },     // Up
             { std::get<0>(current),     std::get<1>(current) - 1 }  // Left
     };
 
@@ -114,6 +130,7 @@ std::tuple<int, int> Maze::nextNeighbor() {
 
 void Maze::searchForPath() {
     findEntryExit();
+
     path.push(startCell);
     visited.push_back(startCell);
 
@@ -127,12 +144,17 @@ void Maze::searchForPath() {
 
             if (path.top() == targetCell) {
                 std::cout << "Path Found!" << std::endl;
+                std::cout << "Start cell: " << get<0>(startCell) << ", " << get<1>(startCell) << std::endl;
+                std::cout << "Target cell: " << get<0>(targetCell) << ", " << get<1>(targetCell) << std::endl;
+                printMaze();
                 break;
             }
         }
     }
 
     if (path.empty()) {
-        std::cout << "No path exists." << std::endl;
+        std::cout << "No solution is possible." << std::endl;
+        std::cout << "Start cell: " << get<0>(startCell) << ", " << get<1>(startCell) << std::endl;
+        std::cout << "Target cell: " << get<0>(targetCell) << ", " << get<1>(targetCell) << std::endl;
     }
 }

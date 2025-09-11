@@ -6,9 +6,6 @@
 
 class Maze {
 public:
-    void printMaze();
-    void printStack();
-
     void inputMazeFile(std::ifstream &inputFile);
     void searchForPath();
     bool isVisited(std::tuple<int, int> cell);
@@ -17,6 +14,7 @@ public:
 
 private:
     void findEntryExit();
+    void printMaze();
 
     std::vector<std::vector<int>> grid;
     std::vector<std::tuple<int, int>> visited;
