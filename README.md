@@ -22,3 +22,7 @@ The program will work on any size maze as long as it is in the correct format of
 The maze will print the solution path of the maze in your input file with the solution being the red *'s following 
 your maze from the start to target points. If the maze does not have a start or an exit point, it will tell you that 
 there is no solution possible for the maze you provided.
+
+## Commands to run on Windows
+g++ -std=c++20 main.cpp Maze.cpp -o maze
+.\maze.exe .\maze0-1_input.txt
